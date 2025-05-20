@@ -163,6 +163,7 @@ async function loadComments() {
     const art     = categoriesMap[c.articleId] || 'No indicado';
     const target  = c.resolved ? resolved : pending;
     const isOwner = currentUser.email === c.email;
+    const safeText = c.text.replace(/'/g, "\\'").replace(/\"/g, '&quot;');
 
     const card = `
       <div class="rounded-lg p-4 space-y-3 shadow" style="background-color: #F2F2F2;">
@@ -170,18 +171,24 @@ async function loadComments() {
           <strong>${c.user}</strong>
           <span class="text-sm text-gray-500">${when}</span>
         </div>
-        <ul class="text-sm text-gray-600 list-disc list-inside">
+        <ul class="text-sm text-gray-600 list-none">
           <li><i class="fas fa-file-alt text-primary"></i> <strong>Artículo:</strong> ${art}</li>
           <li><i class="fas fa-book-open text-primary"></i> <strong>Página:</strong> ${c.page || '—'}</li>
         </ul>
         <p class="text-gray-800 mt-2">${c.text}</p>
-        <div class="flex flex-wrap gap-2">
-          ${!c.resolved && isOwner ? `<button onclick="editComment('${doc.id}', '${c.text.replace(/'/g, "\\'")}")" class="text-blue-700 hover:underline text-sm">Editar</button>` : ''}
+        <div class="flex flex-wrap gap-2 items-center">
+          ${!c.resolved && isOwner ? `
+            <button onclick="editComment('${doc.id}', '${safeText}')" class="text-blue-600 hover:text-blue-800">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="deleteComment('${doc.id}')" class="text-red-600 hover:text-red-800">
+              <i class="fas fa-trash"></i>
+            </button>
+          ` : ''}
           <button onclick="${c.resolved ? `unresolveComment('${doc.id}')` : `resolveComment('${doc.id}')`}" class="text-green-700 hover:underline text-sm">
             ${c.resolved ? 'Desmarcar resuelto' : 'Marcar resuelto'}
           </button>
           ${!c.resolved ? `<button onclick="showReplyForm('${doc.id}')" class="text-indigo-600 hover:underline text-sm">Responder</button>` : ''}
-          ${!c.resolved && isOwner ? `<button onclick="deleteComment('${doc.id}')" class="text-red-600 hover:underline text-sm">Eliminar</button>` : ''}
         </div>
         ${!c.resolved ? `<div id="replyForm-${doc.id}" class="mt-2" style="display:none;">
           <textarea id="replyText-${doc.id}" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Escribe tu respuesta..."></textarea>
