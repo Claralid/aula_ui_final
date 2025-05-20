@@ -243,7 +243,7 @@ async function addReply(commentId) {
          .collection('replies')
          .add({
            text: txt,
-           user: currentUser.displayName,   
+           user: currentUser.displayName,
            timestamp: new Date().toISOString()
          });
   loadComments();
