@@ -168,8 +168,20 @@ async function loadComments() {
     const card = `
       <div class="rounded-lg p-4 space-y-3 shadow" style="background-color: #F2F2F2;">
         <div class="flex items-center justify-between">
-          <strong>${c.user}</strong>
-          <span class="text-sm text-gray-500">${when}</span>
+  <div class="flex items-center gap-2">
+    <strong>${c.user}</strong>
+    <span class="text-sm text-gray-500">${when}</span>
+  </div>
+  ${!c.resolved && isOwner ? `
+    <div class="flex items-center gap-1">
+      <button onclick="editComment('${doc.id}', '${safeText}')" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button onclick="deleteComment('${doc.id}')" class="text-red-600 hover:text-red-800">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  ` : ''}
         </div>
         <ul class="text-sm text-gray-600 list-none">
           <li><i class="fas fa-file-alt text-primary"></i> <strong>Artículo:</strong> ${art}</li>
@@ -231,7 +243,7 @@ async function addReply(commentId) {
          .collection('replies')
          .add({
            text: txt,
-           user: currentUser.displayName,
+           user: currentUser.displayName,   
            timestamp: new Date().toISOString()
          });
   loadComments();
