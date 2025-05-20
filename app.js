@@ -1,4 +1,3 @@
-
 // --- Inicialización ---
 const auth = firebase.auth();
 const db   = firebase.firestore();
@@ -163,6 +162,8 @@ async function loadComments() {
     const when    = getRelativeTime(c.timestamp);
     const art     = categoriesMap[c.articleId] || 'No indicado';
     const target  = c.resolved ? resolved : pending;
+    const isOwner = currentUser.email === c.email;
+
     const card = `
       <div class="rounded-lg p-4 space-y-3 shadow" style="background-color: #F2F2F2;">
         <div class="flex items-center justify-between">
@@ -175,17 +176,17 @@ async function loadComments() {
         </ul>
         <p class="text-gray-800 mt-2">${c.text}</p>
         <div class="flex flex-wrap gap-2">
-          ${currentUser.email === c.email ? `<button onclick="editComment('${doc.id}', '${c.text.replace(/'/g, "\'")}')" class="text-blue-700 hover:underline text-sm">Editar</button>` : ''}
+          ${!c.resolved && isOwner ? `<button onclick="editComment('${doc.id}', '${c.text.replace(/'/g, "\\'")}")" class="text-blue-700 hover:underline text-sm">Editar</button>` : ''}
           <button onclick="${c.resolved ? `unresolveComment('${doc.id}')` : `resolveComment('${doc.id}')`}" class="text-green-700 hover:underline text-sm">
             ${c.resolved ? 'Desmarcar resuelto' : 'Marcar resuelto'}
           </button>
-          <button onclick="showReplyForm('${doc.id}')" class="text-indigo-600 hover:underline text-sm">Responder</button>
-          ${currentUser.email === c.email ? `<button onclick="deleteComment('${doc.id}')" class="text-red-600 hover:underline text-sm">Eliminar</button>` : ''}
+          ${!c.resolved ? `<button onclick="showReplyForm('${doc.id}')" class="text-indigo-600 hover:underline text-sm">Responder</button>` : ''}
+          ${!c.resolved && isOwner ? `<button onclick="deleteComment('${doc.id}')" class="text-red-600 hover:underline text-sm">Eliminar</button>` : ''}
         </div>
-        <div id="replyForm-${doc.id}" class="mt-2" style="display:none;">
+        ${!c.resolved ? `<div id="replyForm-${doc.id}" class="mt-2" style="display:none;">
           <textarea id="replyText-${doc.id}" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Escribe tu respuesta..."></textarea>
           <button class="mt-1 text-green-600 hover:underline text-sm" onclick="addReply('${doc.id}')">Enviar respuesta</button>
-        </div>
+        </div>` : ''}
         <div id="replies-${doc.id}" class="mt-2 space-y-2"></div>
       </div>
     `;
