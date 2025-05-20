@@ -1,3 +1,4 @@
+
 // --- Inicialización ---
 const auth = firebase.auth();
 const db   = firebase.firestore();
@@ -100,7 +101,6 @@ async function deleteCategory(id) {
   loadCategories();
 }
 
-// Helper tiempo
 function getRelativeTime(ts) {
   const now = Date.now(), then = new Date(ts).getTime();
   const diffM = Math.floor((now - then) / 60000);
@@ -112,7 +112,6 @@ function getRelativeTime(ts) {
   return `hace ${diffD} día${diffD !== 1 ? 's' : ''}`;
 }
 
-// Comentarios y respuestas
 async function addComment() {
   const text  = document.getElementById('commentText').value.trim();
   const artId = document.getElementById('commentArticle').value;
@@ -135,6 +134,18 @@ async function resolveComment(id) {
   loadComments();
 }
 
+async function unresolveComment(id) {
+  await db.collection('comentarios').doc(id).update({ resolved: false });
+  loadComments();
+}
+
+function editComment(id, currentText) {
+  const newText = prompt('Editar comentario:', currentText);
+  if (newText !== null && newText.trim() !== '') {
+    db.collection('comentarios').doc(id).update({ text: newText.trim() }).then(loadComments);
+  }
+}
+
 async function deleteComment(id) {
   if (!confirm('¿Eliminar comentario?')) return;
   await db.collection('comentarios').doc(id).delete();
@@ -153,20 +164,23 @@ async function loadComments() {
     const art     = categoriesMap[c.articleId] || 'No indicado';
     const target  = c.resolved ? resolved : pending;
     const card = `
-      <div class="bg-white rounded-lg shadow p-4 space-y-2">
+      <div class="rounded-lg p-4 space-y-3 shadow" style="background-color: #F2F2F2;">
         <div class="flex items-center justify-between">
           <strong>${c.user}</strong>
           <span class="text-sm text-gray-500">${when}</span>
         </div>
-        <div class="text-sm text-gray-600">
-          <span class="font-medium">Artículo:</span> ${art}
-          <span class="ml-2 font-medium">Página:</span> ${c.page || '—'}
-        </div>
-        <p class="text-gray-800">${c.text}</p>
-        <div class="flex gap-2">
-          ${!c.resolved ? `<button class="text-blue-600 hover:underline text-sm" onclick="resolveComment('${doc.id}')">Marcar resuelto</button>` : ''}
-          ${!c.resolved ? `<button class="text-green-600 hover:underline text-sm" onclick="showReplyForm('${doc.id}')">Responder</button>` : ''}
-          <button class="text-red-600 hover:underline text-sm" onclick="deleteComment('${doc.id}')">Eliminar</button>
+        <ul class="text-sm text-gray-600 list-disc list-inside">
+          <li><i class="fas fa-file-alt text-primary"></i> <strong>Artículo:</strong> ${art}</li>
+          <li><i class="fas fa-book-open text-primary"></i> <strong>Página:</strong> ${c.page || '—'}</li>
+        </ul>
+        <p class="text-gray-800 mt-2">${c.text}</p>
+        <div class="flex flex-wrap gap-2">
+          ${currentUser.email === c.email ? `<button onclick="editComment('${doc.id}', '${c.text.replace(/'/g, "\'")}')" class="text-blue-700 hover:underline text-sm">Editar</button>` : ''}
+          <button onclick="${c.resolved ? `unresolveComment('${doc.id}')` : `resolveComment('${doc.id}')`}" class="text-green-700 hover:underline text-sm">
+            ${c.resolved ? 'Desmarcar resuelto' : 'Marcar resuelto'}
+          </button>
+          <button onclick="showReplyForm('${doc.id}')" class="text-indigo-600 hover:underline text-sm">Responder</button>
+          ${currentUser.email === c.email ? `<button onclick="deleteComment('${doc.id}')" class="text-red-600 hover:underline text-sm">Eliminar</button>` : ''}
         </div>
         <div id="replyForm-${doc.id}" class="mt-2" style="display:none;">
           <textarea id="replyText-${doc.id}" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Escribe tu respuesta..."></textarea>
@@ -177,7 +191,6 @@ async function loadComments() {
     `;
     target.insertAdjacentHTML('beforeend', card);
 
-    // Cargar respuestas
     const repliesSnap = await db.collection('comentarios')
                                 .doc(doc.id)
                                 .collection('replies')
