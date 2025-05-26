@@ -1,36 +1,89 @@
-:root{
-  --primary:#1F618D;
-  --secondary:#1ABC9C;  /* verde AULA */
-  --accent:#F39C12;
-  --success:#2ECC71;
-  --error:#E74C3C;
-  --neutral-dark:#2C3E50;
-  --neutral-light:#F7F9FA;
+:root {
+  --primary: #1F618D;
+  --secondary: #1ABC9C;  /* verde AULA */
+  --accent: #F39C12;
+  --success: #2ECC71;
+  --error: #E74C3C;
+  --neutral-dark: #2C3E50;
+  --neutral-light: #F7F9FA;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Helvetica,Arial,sans-serif;background:var(--neutral-light);color:var(--neutral-dark);}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  background: var(--neutral-light);
+  color: var(--neutral-dark);
+}
 
 /* LOGIN */
-.login-container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
-.login-logo{width:80px;height:80px;border-radius:50%;border:2px solid var(--secondary);object-fit:cover}
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.login-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--secondary);
+  object-fit: cover;
+}
 
 /* LAYOUT */
-.app-container{padding:20px;display:none}
-.app-content{display:flex;gap:20px}
+.app-container {
+  padding: 20px;
+  display: none;
+}
+.app-content {
+  display: flex;
+  gap: 20px;
+}
 
 /* PANELS */
-.doc-block,.comments-block{background:#fff;border:2px solid #e5e5e5;border-radius:10px;padding:20px}
-.doc-block{flex:0 0 70%}
-.comments-block{flex:0 0 30%;max-height:80vh;overflow:auto}
+.doc-block,
+.comments-block {
+  background: #fff;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 20px;
+}
+.doc-block {
+  flex: 0 0 70%;
+}
+.comments-block {
+  flex: 0 0 30%;
+  max-height: 80vh;
+  overflow: auto;
+}
 
 /* FORM ELEMENTS */
-textarea,input{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;margin:6px 0;font-size:0.9rem}
+textarea,
+input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 6px 0;
+  font-size: 0.9rem;
+}
 
 /* VIEWER */
-#viewer,#viewer iframe,#viewer embed{width:100%!important;height:500px}
+#viewer,
+#viewer iframe,
+#viewer embed {
+  width: 100% !important;
+  height: 500px;
+}
 
-/* ——— NUEVAS REGLAS PARA SCROLL EN LISTAS ——— */
+/* SCROLL PARA LISTAS DE COMENTARIOS */
 #pendingComments,
 #resolvedComments {
   max-height: 200px;      /* altura máxima ajustable */
