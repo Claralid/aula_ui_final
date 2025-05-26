@@ -4,112 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AULA Correcciones</title>
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#006838',
-            success: '#16a34a',
-            danger: '#dc2626',
-            warning: '#f59e0b'
-          }
-        }
-      }
-    }
-  </script>
-  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="aula-style.css" />
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body>
 
   <!-- LOGIN -->
-  <section id="loginSection" class="flex flex-col items-center justify-center min-h-screen gap-6">
-    <img src="logo-aula.png" alt="Logo AULA" class="w-20 h-20 rounded-full border-2 border-primary object-cover" />
-    <h1 class="text-3xl font-bold text-primary">AULA Correcciones</h1>
-    <button onclick="login()" class="bg-primary text-white px-4 py-2 rounded-md shadow hover:bg-primary/90 transition">
-      Iniciar sesión con Google
-    </button>
+  <section id="loginSection" class="login-container">
+    <img src="logo-aula.png" alt="Logo AULA" class="login-logo" />
+    <h1>AULA Correcciones</h1>
+    <button class="btn-outline" onclick="login()">Iniciar sesión con Google</button>
   </section>
 
   <!-- APP -->
-  <div id="mainApp" class="mx-auto p-6 min-h-screen" style="display:none">
-    <!-- HEADER -->
-    <header class="flex items-center justify-between bg-white shadow rounded p-4 mb-6">
-      <div class="flex items-center gap-3">
-       <img src="logo-aula.png" alt="Logo AULA" class="w-14 h-14 rounded-full border-2 border-primary object-cover">
-        <span class="text-xl font-semibold text-primary">Correcciones</span>
-      </div>
-      <div class="flex items-center gap-4">
-        <span id="username" class="font-medium"></span>
-        <button onclick="logout()" class="bg-danger text-white px-3 py-1 rounded-md shadow hover:bg-danger/90 transition">
-          Cerrar sesión
-        </button>
-      </div>
-    </header>
+  <section id="appSection" class="app-container" style="display:none;">
+    <h1>Comentarios</h1>
 
-    <div class="md:flex md:space-x-6">
-      <!-- DOCUMENT BLOCK (70%) -->
-      <div class="bg-white rounded-lg shadow p-6 w-full md:w-2/3 mb-6 md:mb-0">
-        <h3 class="text-xl font-semibold text-primary mb-4">Documento</h3>
-        <div id="adminSection" class="space-y-4 mb-4" style="display:none;">
-          <input id="docUrl" placeholder="Pega el enlace de Google Docs"
-                 class="w-full border border-gray-300 rounded px-3 py-2" />
-          <button onclick="setDocURL()" class="bg-primary text-white px-4 py-2 rounded-md shadow hover:bg-primary/90 transition">
-            Guardar enlace
-          </button>
-          <h4 class="font-medium text-gray-700">Gestionar artículos:</h4>
-          <ul id="categoryList" class="list-disc list-inside space-y-2"  style="list-style:none;"></ul>
-          <div class="flex gap-2">
-            <input id="newCategory" placeholder="Nueva categoría"
-                   class="flex-1 border border-gray-300 rounded px-3 py-2" />
-            <button onclick="addCategory()" class="bg-primary text-white px-4 py-2 rounded-md shadow hover:bg-primary/90 transition">
-              Crear
-            </button>
-          </div>
-        </div>
-        <div id="viewer" class="w-full"></div>
-      </div>
+    <h4>Nuevo comentario</h4>
+    <textarea id="commentText" placeholder="Escribe tu comentario..."></textarea>
+    <input id="commentPage" placeholder="Página donde está el error" />
+    <button class="btn-outline" onclick="addComment()">Agregar Comentario</button>
 
-      <!-- COMMENTS BLOCK (30%) -->
-      <div class="bg-white rounded-lg shadow p-6 w-full md:w-1/3">
-        <h3 class="text-xl font-semibold text-primary mb-4">Comentarios</h3>
-        <div class="space-y-3 mb-6">
-          <textarea id="commentText" placeholder="Escribe tu comentario..."
-                    class="w-full border border-gray-300 rounded px-3 py-2"></textarea>
-          <div class="flex flex-col gap-2">
-            <select id="commentArticle" class="w-full border border-gray-300 rounded px-3 py-2">
-              <option value="">Selecciona artículo...</option>
-            </select>
-            <input id="commentPage" type="number" min="1" placeholder="Página"
-                   class="w-full border border-gray-300 rounded px-3 py-2" />
-          </div>
-          <button onclick="addComment()" class="bg-success text-white px-4 py-2 rounded-md shadow hover:bg-success/90 transition">
-            Agregar Comentario
-          </button>
-        </div>
+    <h4>
+      Pendientes (<span id="pendingCount">0</span>)
+    </h4>
+    <div id="pendingComments"></div>
 
-        <h4 class="font-medium text-gray-700 mb-2">Pendientes:</h4>
-        <div id="pendingComments" class="space-y-4 mb-6"   style="max-height:600px; overflow:scroll;"></div>
+    <h4>
+      Resueltos (<span id="resolvedCount">0</span>)
+    </h4>
+    <div id="resolvedComments"></div>
+  </section>
 
-        <div class="flex items-center justify-between mb-4">
-          <h4 class="font-medium text-gray-700">Resueltos:</h4>
-          <button id="clearResolved" onclick="clearResolvedComments()" class="bg-warning text-white px-3 py-1 rounded-md shadow hover:bg-warning/90 transition">
-            Limpiar Resueltos
-          </button>
-        </div>
-        <div id="resolvedComments" class="space-y-4"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!-- Configuración y lógica -->
+  <!-- Config & app logic -->
   <script src="firebase-config.js"></script>
   <script src="app.js"></script>
 </body>
