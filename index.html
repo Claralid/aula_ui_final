@@ -4,12 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AULA Correcciones</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Tus estilos personalizados -->
   <link rel="stylesheet" href="aula-style.css" />
 </head>
 <body>
+
   <!-- LOGIN -->
   <section id="loginSection" class="login-container">
     <img src="logo-aula.png" alt="Logo AULA" class="login-logo" />
@@ -18,7 +16,7 @@
   </section>
 
   <!-- APP -->
-  <div id="mainApp" class="app-container" style="display:none;">
+  <div id="mainApp" class="app-container">
     <!-- HEADER -->
     <header class="header-container">
       <div class="header-left">
@@ -35,10 +33,13 @@
       <!-- DOCUMENT BLOCK -->
       <div class="doc-block">
         <h3>Documento</h3>
+
+        <!-- Visible solo para admin -->
         <div id="adminSection" style="display:none;">
           <input id="docUrl" placeholder="Pega el enlace de Google Docs" />
           <button class="btn-outline" onclick="setDocURL()">Guardar enlace</button>
         </div>
+
         <div id="viewer"></div>
       </div>
 
@@ -51,10 +52,10 @@
         <input id="commentPage" placeholder="Página donde está el error" />
         <button class="btn-outline" onclick="addComment()">Agregar Comentario</button>
 
-        <h4>Pendientes (<span id="pendingCount">0</span>)</h4>
+        <h4>Pendientes</h4>
         <div id="pendingComments"></div>
 
-        <h4>Resueltos (<span id="resolvedCount">0</span>)</h4>
+        <h4>Resueltos</h4>
         <div id="resolvedComments"></div>
       </div>
     </div>
@@ -65,9 +66,8 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!-- Configuración de Firebase -->
+  <!-- Config & app logic -->
   <script src="firebase-config.js"></script>
-  <!-- Lógica de la aplicación -->
   <script src="app.js"></script>
 </body>
 </html>

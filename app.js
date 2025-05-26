@@ -1,117 +1,98 @@
-// Inicializa Firebase Auth y Firestore
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentUser = null;
 let currentDocUrl = "";
 
-const allowedEmails = [
-  'cindyclaralid@gmail.com',
-  'a.taveras@unphu.edu.do',
-  'aaguilar@unphu.edu.do',
-  'cguzman@unphu.edu.do'
-];
+const allowedEmails = ['cindyclaralid@gmail.com', 'a.taveras@unphu.edu.do', 'aaguilar@unphu.edu.do' , 'cguzman@unphu.edu.do'];
 const adminEmail = 'cindyclaralid@gmail.com';
 
-// Pedir permiso de notificaciones
-if ('Notification' in window) {
-  Notification.requestPermission().then(permission => {
-    console.log('Permiso de notificaciones:', permission);
-  });
-}
-
-// Login/logout
 function login() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err => alert(err.message));
+  auth.signInWithPopup(provider).catch(alert);
 }
+
 function logout() {
   auth.signOut().then(() => location.reload());
 }
 
-// Manejo de estado de autenticación
 auth.onAuthStateChanged(user => {
-  if (!user) {
-    document.getElementById('loginSection').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    return;
-  }
-  if (!allowedEmails.includes(user.email)) {
+  if (!user) return;
+
+  if (allowedEmails.includes(user.email)) {
+    currentUser = user;
+    document.getElementById("username").innerText = user.displayName;
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+
+    if (user.email === adminEmail) {
+      document.getElementById("adminSection").style.display = "block";
+    } else {
+      document.getElementById("adminSection").style.display = "none";
+    }
+
+    loadDocumentURL();
+    loadComments();
+  } else {
     auth.signOut().then(() => {
-      document.body.innerHTML = '<p>Acceso no autorizado</p>';
+      document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif;"><h2>❌ Acceso no autorizado</h2><p>Este correo no está autorizado para usar esta plataforma.</p></div>';
     });
-    return;
   }
-  currentUser = user;
-  document.getElementById('loginSection').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('username').innerText = user.email;
-  loadComments();
 });
 
-// Guardar enlace de Google Docs (solo admin)
-async function setDocURL() {
-  if (currentUser.email !== adminEmail) return;
-  const url = document.getElementById('docUrl').value.trim();
-  if (!url) return alert('Pega un enlace válido.');
-  await db.collection('config').doc('doc').set({ url });
-  loadViewer(url);
+function setDocURL() {
+  const url = document.getElementById("docUrl").value;
+  db.collection("config").doc("docLink").set({ url });
+  loadDocumentURL();
 }
 
-// Cargar viewer
-async function loadViewer(manualUrl) {
-  const url = manualUrl || (await db.collection('config').doc('doc').get()).data().url;
-  document.getElementById('viewer').innerHTML = `<iframe src="${url}" frameborder="0"></iframe>`;
+async function loadDocumentURL() {
+  const doc = await db.collection("config").doc("docLink").get();
+  if (doc.exists) {
+    currentDocUrl = doc.data().url;
+    const match = currentDocUrl.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+    const docId = match ? match[1] : null;
+    const embedUrl = docId ? `https://docs.google.com/document/d/${docId}/preview` : "";
+    document.getElementById("viewer").innerHTML = embedUrl ? `<iframe src="${embedUrl}"></iframe>` : "No se ha configurado un documento.";
+  }
 }
 
-// Agregar comentario
 async function addComment() {
-  const textEl = document.getElementById('commentText');
-  const pageEl = document.getElementById('commentPage');
-  const text = textEl.value.trim();
-  const page = pageEl.value.trim();
-  if (!text) return alert('Escribe algo antes de enviar.');
-  await db.collection('comentarios').add({
-    user: currentUser.email,
+  const text = document.getElementById("commentText").value;
+  const page = document.getElementById("commentPage").value;
+  if (!text || !currentUser) return;
+  await db.collection("comentarios").add({
     text,
     page,
-    resolved: false,
-    timestamp: Date.now()
+    timestamp: new Date().toISOString(),
+    user: currentUser.displayName,
+    email: currentUser.email,
+    resolved: false
   });
-  textEl.value = '';
-  pageEl.value = '';
+  document.getElementById("commentText").value = "";
+  document.getElementById("commentPage").value = "";
   loadComments();
 }
 
-// Marcar como resuelto
-function resolveComment(id) {
-  db.collection('comentarios').doc(id).update({ resolved: true });
+async function resolveComment(id) {
+  await db.collection("comentarios").doc(id).update({ resolved: true });
   loadComments();
 }
 
-// Eliminar comentario
-function deleteComment(id) {
-  db.collection('comentarios').doc(id).delete();
-  loadComments();
+async function deleteComment(id) {
+  if (confirm("¿Estás segura de que quieres eliminar este comentario?")) {
+    await db.collection("comentarios").doc(id).delete();
+    loadComments();
+  }
 }
 
-// Cargar y renderizar comentarios + notificaciones
 async function loadComments() {
-  const pendingEl = document.getElementById('pendingComments');
-  const resolvedEl = document.getElementById('resolvedComments');
-  const pendingCountEl = document.getElementById('pendingCount');
-  const resolvedCountEl = document.getElementById('resolvedCount');
+  const pending = document.getElementById("pendingComments");
+  const resolved = document.getElementById("resolvedComments");
+  pending.innerHTML = "";
+  resolved.innerHTML = "";
 
-  pendingEl.innerHTML = '';
-  resolvedEl.innerHTML = '';
-
-  let pendingCount = 0;
-  let resolvedCount = 0;
-
-  const snapshot = await db.collection('comentarios')
-    .orderBy('timestamp', 'desc')
-    .get();
-
+  const snapshot = await db.collection("comentarios").orderBy("timestamp", "desc").get();
   snapshot.forEach(doc => {
     const c = doc.data();
     const html = `
@@ -119,29 +100,16 @@ async function loadComments() {
         <strong>${c.user} - ${new Date(c.timestamp).toLocaleString()}</strong><br>
         Página: ${c.page || 'No indicada'}<br>
         ${c.text}<br>
-        ${c.resolved
+        ${c.resolved 
           ? "<div class='resolved'>✅ Resuelto</div>"
-          : `<button class="btn-resolve" onclick="resolveComment('${doc.id}')">Marcar como resuelto</button>`}
-        <button class="btn-delete" onclick="deleteComment('${doc.id}')">Eliminar</button>
+          : `<button onclick="resolveComment('${doc.id}')">Marcar como resuelto</button>`}
+        <button onclick="deleteComment('${doc.id}')">Eliminar</button>
       </div>
     `;
-
     if (c.resolved) {
-      resolvedEl.insertAdjacentHTML('beforeend', html);
-      resolvedCount++;
+      resolved.innerHTML += html;
     } else {
-      pendingEl.insertAdjacentHTML('beforeend', html);
-      pendingCount++;
-      // Web Push Notification
-      if (Notification.permission === 'granted') {
-        new Notification(`Nuevo comentario de ${c.user}`, {
-          body: c.text.substring(0, 50) + '…',
-          tag: doc.id
-        });
-      }
+      pending.innerHTML += html;
     }
   });
-
-  pendingCountEl.innerText = pendingCount;
-  resolvedCountEl.innerText = resolvedCount;
 }

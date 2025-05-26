@@ -1,3 +1,4 @@
+
 // Firebase v8 compatible config (sin módulos ES)
 var firebaseConfig = {
   apiKey: "AIzaSyAt2C-ITjDbjKlJn-TTxX359QTC0Z2VTg4",
