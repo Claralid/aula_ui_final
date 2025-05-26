@@ -1,9 +1,12 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AULA Correcciones</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="aula-style.css" />
 </head>
 <body>
@@ -15,28 +18,56 @@
     <button class="btn-outline" onclick="login()">Iniciar sesión con Google</button>
   </section>
 
-  <!-- APP -->
-  <section id="appSection" class="app-container" style="display:none;">
-    <h1>Comentarios</h1>
+  <!-- APP PRINCIPAL -->
+  <div id="mainApp" class="app-container">
+    <!-- HEADER -->
+    <header class="header-container">
+      <div class="header-left">
+        <img src="logo-aula.png" alt="Logo AULA" class="header-logo" />
+        <span class="header-title">AULA Correcciones</span>
+      </div>
+      <div class="header-right">
+        <span id="username"></span>
+        <button class="btn-outline" onclick="logout()">Cerrar sesión</button>
+      </div>
+    </header>
 
-    <h4>Nuevo comentario</h4>
-    <textarea id="commentText" placeholder="Escribe tu comentario..."></textarea>
-    <input id="commentPage" placeholder="Página donde está el error" />
-    <button class="btn-outline" onclick="addComment()">Agregar Comentario</button>
+    <div class="app-content">
+      <!-- BLOQUE DOCUMENTO -->
+      <div class="doc-block">
+        <!-- Sección admin para configurar el enlace -->
+        <div id="adminSection" style="display:none;">
+          <input id="docUrl" placeholder="Pega el enlace de Google Docs" />
+          <button class="btn-outline" onclick="setDocURL()">Guardar enlace</button>
+        </div>
+        <!-- Visor de Google Docs -->
+        <div id="viewer"></div>
+      </div>
 
-    <h4>Pendientes (<span id="pendingCount">0</span>)</h4>
-    <div id="pendingComments"></div>
+      <!-- BLOQUE COMENTARIOS -->
+      <div class="comments-block">
+        <h3>Comentarios</h3>
 
-    <h4>Resueltos (<span id="resolvedCount">0</span>)</h4>
-    <div id="resolvedComments"></div>
-  </section>
+        <h4>Nuevo comentario</h4>
+        <textarea id="commentText" placeholder="Escribe tu comentario..."></textarea>
+        <input id="commentPage" placeholder="Página donde está el error" />
+        <button class="btn-outline" onclick="addComment()">Agregar Comentario</button>
+
+        <h4>Pendientes (<span id="pendingCount">0</span>)</h4>
+        <div id="pendingComments"></div>
+
+        <h4>Resueltos (<span id="resolvedCount">0</span>)</h4>
+        <div id="resolvedComments"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!-- Config & app logic -->
+  <!-- Configuración & Lógica de la app -->
   <script src="firebase-config.js"></script>
   <script src="app.js"></script>
 </body>
