@@ -1,16 +1,15 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AULA Correcciones</title>
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tus estilos personalizados -->
   <link rel="stylesheet" href="aula-style.css" />
 </head>
 <body>
-
   <!-- LOGIN -->
   <section id="loginSection" class="login-container">
     <img src="logo-aula.png" alt="Logo AULA" class="login-logo" />
@@ -18,8 +17,8 @@
     <button class="btn-outline" onclick="login()">Iniciar sesión con Google</button>
   </section>
 
-  <!-- APP PRINCIPAL -->
-  <div id="mainApp" class="app-container">
+  <!-- APP -->
+  <div id="mainApp" class="app-container" style="display:none;">
     <!-- HEADER -->
     <header class="header-container">
       <div class="header-left">
@@ -33,18 +32,17 @@
     </header>
 
     <div class="app-content">
-      <!-- BLOQUE DOCUMENTO -->
+      <!-- DOCUMENT BLOCK -->
       <div class="doc-block">
-        <!-- Sección admin para configurar el enlace -->
+        <h3>Documento</h3>
         <div id="adminSection" style="display:none;">
           <input id="docUrl" placeholder="Pega el enlace de Google Docs" />
           <button class="btn-outline" onclick="setDocURL()">Guardar enlace</button>
         </div>
-        <!-- Visor de Google Docs -->
         <div id="viewer"></div>
       </div>
 
-      <!-- BLOQUE COMENTARIOS -->
+      <!-- COMMENTS BLOCK -->
       <div class="comments-block">
         <h3>Comentarios</h3>
 
@@ -67,8 +65,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!-- Configuración & Lógica de la app -->
+  <!-- Configuración de Firebase -->
   <script src="firebase-config.js"></script>
+  <!-- Lógica de la aplicación -->
   <script src="app.js"></script>
 </body>
 </html>
